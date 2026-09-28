@@ -1,0 +1,78 @@
+{
+  "_instrucciones": "Completa cada 'respuesta' con UNA de las opciones permitidas. Las respuestas correctas están hasheadas en tests/_claves.json (sin spoilers).",
+  "runtimes": {
+    "_opciones": [
+      "agent_runtime",
+      "cloud_run",
+      "gke"
+    ],
+    "E1": {
+      "escenario": "Agente ADK en Python; quieren Sessions y Memory Bank gestionados, trazas integradas y cero administración de infraestructura.",
+      "respuesta": ""
+    },
+    "E2": {
+      "escenario": "Agente escrito en Go expuesto por HTTP; debe escalar a cero de noche y quedar detrás del Load Balancer + IAP existentes.",
+      "respuesta": ""
+    },
+    "E3": {
+      "escenario": "Plataforma que ejecuta código generado por LLM con aislamiento gVisor y co-aloja Gemma en GPUs con carga alta y estable (quieren CUDs).",
+      "respuesta": ""
+    },
+    "E4": {
+      "escenario": "Agente en Node.js disparado por eventos de Pub/Sub/Eventarc, tráfico muy irregular, cualquier lenguaje, pagar solo por uso.",
+      "respuesta": ""
+    },
+    "E5": {
+      "escenario": "Equipo pequeño de Python que necesita identidad por agente, división de tráfico entre revisiones y memoria de largo plazo con mínima operación.",
+      "respuesta": ""
+    },
+    "E6": {
+      "escenario": "Tareas agénticas de varias horas, node pools personalizados, HPA a medida y control total de la red del clúster.",
+      "respuesta": ""
+    }
+  },
+  "diagnosticos": {
+    "_opciones": [
+      "max_llm_calls",
+      "min_instances",
+      "session_service_uri",
+      "reflect_retry_plugin",
+      "eventos_recientes_y_cache",
+      "psc_interface",
+      "cuota_o_provisioned_throughput",
+      "monitores_online"
+    ],
+    "D1": {
+      "sintoma": "Trazas con decenas de call_llm → execute_tool repetidos por invocación y picos de tokens.",
+      "respuesta": ""
+    },
+    "D2": {
+      "sintoma": "p95 alto solo en ráfagas de la mañana; el número de instancias salta de 0 a 20.",
+      "respuesta": ""
+    },
+    "D3": {
+      "sintoma": "En Cloud Run los usuarios pierden el contexto tras cada despliegue o scale-in.",
+      "respuesta": ""
+    },
+    "D4": {
+      "sintoma": "Un backend devuelve 503 esporádicos y la ejecución completa del agente aborta.",
+      "respuesta": ""
+    },
+    "D5": {
+      "sintoma": "La latencia crece con cada turno; los tokens de entrada aumentan en cada llamada.",
+      "respuesta": ""
+    },
+    "D6": {
+      "sintoma": "Desde Agent Runtime, timeouts al llamar una API interna on-prem accesible solo por la VPC.",
+      "respuesta": ""
+    },
+    "D7": {
+      "sintoma": "Errores 429 RESOURCE_EXHAUSTED en las llamadas al modelo en el panel de Observability.",
+      "respuesta": ""
+    },
+    "D8": {
+      "sintoma": "Seis semanas después del lanzamiento la calidad baja, pero las evaluaciones offline siguen pasando.",
+      "respuesta": ""
+    }
+  }
+}

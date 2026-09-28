@@ -1,0 +1,17 @@
+{
+  "caso": "De piloto a producción",
+  "criterios": [
+    {"id": "evaluacion", "descripcion": "Golden set basado en sesiones reales curadas + casos borde/adversariales/sintéticos; trayectoria (IN_ORDER para el flujo estricto) + métrica semántica con referencia + rúbricas para respuestas abiertas + alucinación/seguridad; umbrales explícitos; juez calibrado con humanos.", "puntos": 5,
+     "indicadores": ["datos reales", "trayectoria IN_ORDER", "semántica/rúbricas", "alucinación", "umbrales"]},
+    {"id": "cicd", "descripcion": "PR: evalset pequeño con métricas deterministas (pytest/adk eval) como gate; nightly/pre-release: suites con juez LLM y simulación de usuario; release bloqueado por regresión.", "puntos": 4,
+     "indicadores": ["gate barato por PR", "LLM judge en nightly", "criterio de bloqueo"]},
+    {"id": "monitoreo", "descripcion": "Monitores online sobre trazas muestreadas con alertas en Cloud Monitoring; BigQuery agent analytics; casos malos vuelven al golden set.", "puntos": 3,
+     "indicadores": ["online eval", "alertas", "cierre del ciclo"]},
+    {"id": "runtime", "descripcion": "Agent Runtime (Python, equipo pequeño, sin K8s) con min_instances para picos, concurrencia ajustada, Sessions/Memory Bank gestionados, PSC interface para la API privada, revisiones con división de tráfico para canary; o justifica bien una alternativa.", "puntos": 5,
+     "indicadores": ["runtime adecuado", "min_instances", "sesiones gestionadas", "PSC-I", "canary"]},
+    {"id": "diagnostico", "descripcion": "Loops → max_llm_calls (+ condiciones de salida); contexto perdido → sesiones externas; 429 → cuota/Provisioned Throughput; latencia creciente → historial reciente + context caching; errores transitorios → ReflectAndRetryToolPlugin.", "puntos": 5,
+     "indicadores": ["5 problemas con su perilla"]},
+    {"id": "observabilidad", "descripcion": "Cloud Trace (spans invoke_agent/call_llm/execute_tool), métricas gen_ai.* en Cloud Monitoring, logs sin contenido sensible en producción, dashboards de tokens/latencia/errores.", "puntos": 3,
+     "indicadores": ["trazas", "métricas", "logs responsables"]}
+  ]
+}

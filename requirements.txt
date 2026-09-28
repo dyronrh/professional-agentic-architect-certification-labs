@@ -1,0 +1,5 @@
+# Núcleo del evaluador y labs
+pytest>=8
+pyyaml>=6
+# Labs de las sesiones 3, 4 y 5 + juez Gemini (incluye google-genai)
+google-adk>=2.0

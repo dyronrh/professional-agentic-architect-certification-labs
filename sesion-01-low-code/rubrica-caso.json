@@ -1,0 +1,41 @@
+{
+  "caso": "Conocimiento empresarial en Gemini Enterprise",
+  "criterios": [
+    {
+      "id": "identidad",
+      "descripcion": "Configura Workforce Identity Federation con Entra ID antes de crear data stores de ingesta, y reconoce que cambiar de IdP después obliga a recrearlos.",
+      "puntos": 3,
+      "indicadores": ["WIF + Entra ID", "orden: IdP antes de data stores", "consecuencia de cambiar IdP"]
+    },
+    {
+      "id": "fuentes",
+      "descripcion": "Litigios en SharePoint vía conector federado (datos no salen de M365); resto de SharePoint ingestado; pólizas escaneadas ingestadas con layout parser/OCR y chunking consciente de layout; justifica calidad vs frescura.",
+      "puntos": 5,
+      "indicadores": ["federado para Litigios", "ingesta para resto", "layout parser + OCR", "chunking", "trade-off frescura/calidad"]
+    },
+    {
+      "id": "acls",
+      "descripcion": "ACLs habilitadas al crear el data store (no se activan después); IAM de la fuente no se hereda; ingesta periódica de BigQuery no respeta ACLs → propone alternativa (one-time con ACL, o acceso vía herramienta/consulta con la identidad del usuario / vistas por región).",
+      "puntos": 5,
+      "indicadores": ["ACL en creación", "IAM no se importa", "periódica BQ sin ACL", "alternativa válida para siniestros por región"]
+    },
+    {
+      "id": "videos",
+      "descripcion": "Cloud Storage → Gemini multimodal (batch) genera transcripción/capítulos con timestamps → ingesta de documentos derivados con URI del video y ACL → el agente cita minuto. Considera costo (FPS/tokens).",
+      "puntos": 4,
+      "indicadores": ["documentos derivados", "timestamps", "no subir MP4 a data store no estructurado", "costo"]
+    },
+    {
+      "id": "automatizacion",
+      "descripcion": "Workflow Builder (antes Agent Designer) en Gemini Enterprise para analistas de negocio, con paso de aprobación humana (HITL) explícito en el flujo, no en instrucciones.",
+      "puntos": 4,
+      "indicadores": ["Workflow Builder", "paso HITL determinista", "persona correcta"]
+    },
+    {
+      "id": "riesgos",
+      "descripcion": "Identifica al menos dos riesgos reales (p. ej. límites de páginas OCR, 3.000 readers por documento, frescura del índice, costos de video, calidad inferior de búsqueda federada) con mitigación concreta.",
+      "puntos": 3,
+      "indicadores": ["2 riesgos concretos", "mitigaciones accionables"]
+    }
+  ]
+}

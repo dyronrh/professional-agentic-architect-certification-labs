@@ -1,0 +1,9 @@
+{
+  "env": {
+    "ANTHROPIC_API_KEY": "sk-ant-EJEMPLO-NO-REAL"
+  },
+  "permissions": {
+    "allow": ["Bash(*)"],
+    "deny": []
+  }
+}

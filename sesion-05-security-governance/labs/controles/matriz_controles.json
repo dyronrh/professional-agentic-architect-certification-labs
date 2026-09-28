@@ -1,0 +1,70 @@
+{
+  "_instrucciones": "Para cada escenario elige el control PRINCIPAL de la lista _opciones. Respuestas hasheadas en tests/_claves.json.",
+  "_opciones": [
+    "agent_gateway_policy",
+    "agent_identity",
+    "api_key_vault",
+    "dry_run",
+    "hitl_confirmation",
+    "id_token_run_invoker",
+    "model_armor_floor",
+    "oauth_2lo",
+    "oauth_3lo",
+    "principal_access_boundary",
+    "semantic_governance",
+    "vpc_service_controls",
+    "workload_identity_gke"
+  ],
+  "C1": {
+    "escenario": "No importa qué roles se concedan después: los agentes de la carpeta retail-agents nunca deben acceder a recursos fuera de la carpeta retail.",
+    "respuesta": ""
+  },
+  "C2": {
+    "escenario": "El CISO quiere un mínimo de protección contra prompt injection y datos sensibles en TODA la organización, que los equipos no puedan rebajar.",
+    "respuesta": ""
+  },
+  "C3": {
+    "escenario": "Los agentes pueden usar el servidor MCP de un socio, pero solo sus herramientas de solo lectura; deleteRecord debe bloquearse centralmente y cada llamada auditarse por agente.",
+    "respuesta": ""
+  },
+  "C4": {
+    "escenario": "Cumplimiento cambia cada trimestre reglas como 'no ofrecer descuentos > 15 % a clientes enterprise' y quiere aplicarlas sin redeploy de los agentes.",
+    "respuesta": ""
+  },
+  "C5": {
+    "escenario": "Seguridad quiere credenciales ligadas al ciclo de vida de cada agente, no reutilizables fuera de él, y saber qué agente accedió a qué recurso.",
+    "respuesta": ""
+  },
+  "C6": {
+    "escenario": "El agente crea eventos en un calendario SaaS en nombre del empleado conectado, con su consentimiento y sus permisos.",
+    "respuesta": ""
+  },
+  "C7": {
+    "escenario": "Un agente batch nocturno (sin usuario) sincroniza datos con una API SaaS que soporta OAuth client credentials.",
+    "respuesta": ""
+  },
+  "C8": {
+    "escenario": "Una integración de terceros solo acepta una API key estática; no puede aparecer en código ni en variables del repo.",
+    "respuesta": ""
+  },
+  "C9": {
+    "escenario": "El agente debe invocar un servidor MCP privado en Cloud Run (--no-allow-unauthenticated) que solo nuestros agentes pueden usar.",
+    "respuesta": ""
+  },
+  "C10": {
+    "escenario": "Los reembolsos mayores a USD 1.000 deben ser aprobados por un humano antes de ejecutarse.",
+    "respuesta": ""
+  },
+  "C11": {
+    "escenario": "Un agente desplegado en GKE necesita llamar APIs de Google sin llaves de service account.",
+    "respuesta": ""
+  },
+  "C12": {
+    "escenario": "Evitar la exfiltración de datos de BigQuery/Cloud Storage fuera del perímetro de servicios de Google de la organización.",
+    "respuesta": ""
+  },
+  "C13": {
+    "escenario": "Vas a activar políticas nuevas de acceso para 40 agentes en producción sin romper llamadas legítimas.",
+    "respuesta": ""
+  }
+}

@@ -1,0 +1,278 @@
+{
+  "sesion": 1,
+  "dominio": "Building agents using low-code tools (~13%)",
+  "preguntas": [
+    {
+      "id": "S1-Q01",
+      "objetivo": "1.1",
+      "concepto": "Selección de superficie low-code",
+      "dificultad": "media",
+      "pregunta": "A finance team of business analysts (no coding skills) wants an agent in the Gemini Enterprise web app that reads new invoices from Gmail, creates a Jira ticket, and waits for a manager's approval before emailing the vendor. What should you recommend?",
+      "opciones": {
+        "A": "Build an ADK agent and deploy it to Agent Runtime, then register it in Gemini Enterprise.",
+        "B": "Build a CX Agent Studio flow with pages for each step.",
+        "C": "Write a long system instruction in Agent Studio telling the model to wait for approval.",
+        "D": "Use Workflow Builder (formerly Agent Designer) in Gemini Enterprise with a multi-step flow and a human approval step."
+      },
+      "respuesta": [
+        "D"
+      ],
+      "explicacion": "Persona = usuarios de negocio en la app web de Gemini Enterprise + automatización cross-app + HITL → Workflow Builder (antes Agent Designer) con un paso de aprobación. A exige código; B está pensado para conversaciones de CX (voz/chat); C confía en una instrucción no determinista para un control que debe ser garantizado."
+    },
+    {
+      "id": "S1-Q02",
+      "objetivo": "1.1",
+      "concepto": "Determinismo: flujos vs instrucciones",
+      "dificultad": "media",
+      "pregunta": "A bank's conversational agent must ALWAYS authenticate the caller before disclosing any account data. In testing, the generative agent occasionally skips authentication when users insist. What is the most reliable fix?",
+      "opciones": {
+        "A": "Lower the model temperature to 0.",
+        "B": "Model authentication as a deterministic flow (pages + condition routes) or enforce it with a callback/handoff rule, so account pages are only reachable after the auth parameter is set.",
+        "C": "Add more few-shot examples showing authentication first.",
+        "D": "Add 'ALWAYS authenticate first' in capital letters at the top of the instructions."
+      },
+      "respuesta": [
+        "B"
+      ],
+      "explicacion": "El determinismo viene de los flujos (máquina de estados: pages, transition routes, event handlers), handoff rules y callbacks, no de las instrucciones. D, C y A mejoran la probabilidad pero no garantizan el orden."
+    },
+    {
+      "id": "S1-Q03",
+      "objetivo": "1.1",
+      "concepto": "Scope de rutas en flujos",
+      "dificultad": "difícil",
+      "pregunta": "In a CX Agent Studio (Dialogflow CX-style) flow, you added a flow-level CONDITION route that should trigger when $session.params.fraud_flag = true. It works on the flow's start page but never fires while the user is on the 'CollectAddress' page. Why?",
+      "opciones": {
+        "A": "Condition routes only evaluate on END_SESSION.",
+        "B": "Session parameters cannot be used in conditions.",
+        "C": "The page needs a webhook to evaluate conditions.",
+        "D": "Flow-level routes are only in scope on the start page, except intent routes, which remain in scope; move the condition route to the relevant pages (or to a route group used by them)."
+      },
+      "respuesta": [
+        "D"
+      ],
+      "explicacion": "Regla de scope: cuando la página activa no es la inicial, de las rutas del flujo solo las de intent siguen en scope. Las condition routes a nivel de flujo solo se evalúan en la start page. Solución: añadir la ruta (o un route group) a las páginas donde debe evaluarse."
+    },
+    {
+      "id": "S1-Q04",
+      "objetivo": "1.1",
+      "concepto": "Manejo de errores de webhook",
+      "dificultad": "difícil",
+      "pregunta": "A page calls a webhook on a transition route that also has a target page. When the webhook times out, the conversation silently moves to the target page and no error handling occurs. What should you do?",
+      "opciones": {
+        "A": "Add an event handler for webhook.error (and/or webhook.error.timeout) on the page and design the route so the transition depends on the webhook result (e.g. a condition on a parameter set by the webhook).",
+        "B": "Move the webhook call to the agent's global instructions.",
+        "C": "Nothing; webhook errors cannot be handled in flows.",
+        "D": "Increase the page's no-match count."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "Los errores de webhook se manejan con event handlers (webhook.error*). Si la ruta que llama el webhook ya tiene destino, la transición puede ocurrir igualmente; condiciona la transición al resultado del webhook y maneja el evento de error explícitamente."
+    },
+    {
+      "id": "S1-Q05",
+      "objetivo": "1.1",
+      "concepto": "Estructurar instrucciones",
+      "dificultad": "fácil",
+      "pregunta": "Your low-code agent's instructions are three long paragraphs of prose. The agent frequently ignores a formatting rule buried in the middle. What is the most appropriate first change?",
+      "opciones": {
+        "A": "Restructure the instructions into clearly delimited sections (e.g. XML tags such as <role>, <constraints>, <output_format>) and add one or two few-shot examples of the format.",
+        "B": "Fine-tune a model on the desired output format.",
+        "C": "Repeat the rule five times throughout the prose.",
+        "D": "Switch to a larger model."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "Primero se ajusta el prompt: estructura (XML/secciones) + few-shot para fidelidad de formato. Fine-tuning es excesivo para un problema de formato; cambiar de modelo o repetir la regla no ataca la causa."
+    },
+    {
+      "id": "S1-Q06",
+      "objetivo": "1.1",
+      "concepto": "Variables estáticas vs dinámicas",
+      "dificultad": "difícil",
+      "pregunta": "A tool updates the customer's loyalty tier during the conversation, and the agent's instructions must always reflect the current tier. Another value, a large product catalog, never changes during a session. How should you reference each in the agent instructions?",
+      "opciones": {
+        "A": "Loyalty tier as a static variable; catalog as a dynamic variable.",
+        "B": "Both as dynamic variables.",
+        "C": "Both as static variables.",
+        "D": "Loyalty tier as a dynamic variable (updates mid-session); product catalog as a static variable (compiled in, maximizes adherence and cache reuse)."
+      },
+      "respuesta": [
+        "D"
+      ],
+      "explicacion": "Valores que cambian turno a turno → variable dinámica; contenido grande y estable → variable estática (mejor adherencia; cambiarla invalida el cache del prompt, pero no cambia en la sesión)."
+    },
+    {
+      "id": "S1-Q07",
+      "objetivo": "1.1",
+      "concepto": "Agent Studio → código",
+      "dificultad": "fácil",
+      "pregunta": "A developer prototyped a multi-agent design visually in Agent Studio in the Cloud console and now wants the platform team to version it in Git, add unit tests and deploy it via CI/CD. What is the most efficient path?",
+      "opciones": {
+        "A": "Take screenshots of the canvas and share them with the platform team.",
+        "B": "Rebuild the agent from scratch in ADK.",
+        "C": "Keep it only in Agent Studio; low-code agents cannot be deployed.",
+        "D": "Use Agent Studio's option to export the design as ADK code ('Get code'), commit it, and continue the lifecycle in code."
+      },
+      "respuesta": [
+        "D"
+      ],
+      "explicacion": "Agent Studio (persona desarrollador, consola de Cloud) permite exportar a código ADK y continuar el ciclo de vida (Git, tests, deploy a Agent Runtime). Reconstruir desde cero desperdicia trabajo."
+    },
+    {
+      "id": "S1-Q08",
+      "objetivo": "1.2",
+      "concepto": "Federado vs ingestado",
+      "dificultad": "media",
+      "pregunta": "Legal requires that SharePoint content must NOT be copied into Google Cloud, and results must respect each user's existing SharePoint permissions. Employees search it from Gemini Enterprise. Which approach fits?",
+      "opciones": {
+        "A": "Ingest SharePoint into an Agent Search data store with ACLs.",
+        "B": "Export SharePoint to Cloud Storage nightly and index it.",
+        "C": "Use a federated SharePoint connector so queries are executed against the source with the user's delegated OAuth credentials.",
+        "D": "Grant a service account read access to all SharePoint sites."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "Federado = los datos se quedan en la fuente, frescura en tiempo real y la fuente aplica los permisos vía OAuth del usuario. A y B copian datos a Google Cloud; D rompe permisos por usuario."
+    },
+    {
+      "id": "S1-Q09",
+      "objetivo": "1.2",
+      "concepto": "Federado vs ingestado",
+      "dificultad": "media",
+      "pregunta": "Users complain that federated search over thousands of complex, table-heavy PDFs returns poor results. Data can be stored in Google Cloud. What improves answer quality the most?",
+      "opciones": {
+        "A": "Keep federation and increase the number of results.",
+        "B": "Add more instructions to the agent about reading tables.",
+        "C": "Convert all PDFs to plain text and upload them to Drive.",
+        "D": "Switch to ingestion into a data store with a layout-aware parser and chunking, with ACLs enabled."
+      },
+      "respuesta": [
+        "D"
+      ],
+      "explicacion": "La ingesta permite parsing de layout, chunking consciente de estructura, índice propio y mejor relevancia cross-source. Federado depende de la búsqueda de la fuente. Convertir a texto plano pierde estructura de tablas."
+    },
+    {
+      "id": "S1-Q10",
+      "objetivo": "1.2",
+      "concepto": "ACLs en data stores",
+      "dificultad": "difícil",
+      "pregunta": "After launch, you discover that an ingested data store in Gemini Enterprise was created without access control, so all users see all documents. What must you do?",
+      "opciones": {
+        "A": "Create a new data store with access control enabled at creation time, ingest documents with ACL metadata (readers principals), and retire the old one.",
+        "B": "Toggle ACLs on in the data store settings.",
+        "C": "Add an instruction telling the agent not to reveal confidential documents.",
+        "D": "Grant BigQuery IAM roles on the source; Gemini Enterprise will inherit them."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "El control de acceso se define al crear el data store y no se activa después. Los permisos IAM de la fuente no se importan: debes enviar metadatos de ACL (readers). C no es un control de seguridad."
+    },
+    {
+      "id": "S1-Q11",
+      "objetivo": "1.2",
+      "concepto": "Proveedor de identidad",
+      "dificultad": "difícil",
+      "pregunta": "Your company uses Microsoft Entra ID as its identity provider and wants to ingest SharePoint Online and OneDrive into Gemini Enterprise with per-user access control. What identity configuration is required?",
+      "opciones": {
+        "A": "Google Identity only, with users manually recreated in Cloud Identity.",
+        "B": "No identity configuration; ACLs are copied automatically.",
+        "C": "Workforce Identity Federation with Entra ID as the IdP, configured before creating the ingestion data stores.",
+        "D": "A shared service account with Microsoft Graph admin consent."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "Ingerir fuentes de Microsoft 365 con ACLs requiere Workforce Identity Federation con Entra ID. Cambiar de IdP después obliga a recrear data stores, así que se configura antes."
+    },
+    {
+      "id": "S1-Q12",
+      "objetivo": "1.2",
+      "concepto": "Parsers",
+      "dificultad": "media",
+      "pregunta": "You are ingesting scanned (image-only) contracts that contain tables and multi-column layouts. Which parser choice gives the best retrieval quality?",
+      "opciones": {
+        "A": "Digital parser (default).",
+        "B": "No parser; upload the raw files.",
+        "C": "Layout parser (with OCR for scanned content), enabling layout-aware chunking.",
+        "D": "Convert files to MP4 and use a media data store."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "El parser digital solo extrae texto nativo. Los PDFs escaneados necesitan OCR; con tablas y columnas, el layout parser (con chunking consciente del layout) conserva la estructura."
+    },
+    {
+      "id": "S1-Q13",
+      "objetivo": "1.2",
+      "concepto": "Ingesta multimodal",
+      "dificultad": "difícil",
+      "pregunta": "HR wants employees to ask questions about 2,000 hours of training videos and get answers that cite the exact moment in the video. What architecture fits best?",
+      "opciones": {
+        "A": "Send every full video to the model at query time.",
+        "B": "Land videos in Cloud Storage, use Gemini (batch) to generate transcripts and chapter summaries with timestamps, ingest those derived documents (with the video URI and ACL metadata), and have the agent cite chapter/timestamp.",
+        "C": "Upload MP4 files directly into an unstructured document data store.",
+        "D": "Fine-tune Gemini on the videos."
+      },
+      "respuesta": [
+        "B"
+      ],
+      "explicacion": "Patrón: GCS → Gemini multimodal genera transcripciones/capítulos con timestamps → se ingieren documentos derivados con URI del video + ACLs. C no es un tipo soportado para entender el contenido; A es carísimo y lento; D no aplica."
+    },
+    {
+      "id": "S1-Q14",
+      "objetivo": "1.2",
+      "concepto": "Búsqueda de imágenes",
+      "dificultad": "media",
+      "pregunta": "A retailer wants employees to find product photos by typing natural-language descriptions such as 'red running shoe on white background'. Which approach is most appropriate?",
+      "opciones": {
+        "A": "OCR every image.",
+        "B": "Store images in a media data store and rely on its metadata only.",
+        "C": "Generate multimodal embeddings for images and text queries and use vector search (e.g. Agent Retrieval/Vector Search or BigQuery vector search).",
+        "D": "Keyword search over image file names."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "Buscar imágenes por descripción textual = embeddings multimodales (texto e imagen en el mismo espacio) + búsqueda vectorial."
+    },
+    {
+      "id": "S1-Q15",
+      "objetivo": "1.2",
+      "concepto": "Ingesta periódica y ACLs",
+      "dificultad": "difícil",
+      "pregunta": "You configured a PERIODIC sync from BigQuery into a Gemini Enterprise data store and expected per-row ACLs to be enforced, but every user sees every row. What is the most likely cause?",
+      "opciones": {
+        "A": "BigQuery does not support ACLs at all.",
+        "B": "Periodic ingestion mode does not apply ACLs; use one-time ingestion with ACL metadata (or a design that enforces access at the source, e.g. federated/tool-based access).",
+        "C": "Users lack the Discovery Engine Viewer role.",
+        "D": "The agent's temperature is too high."
+      },
+      "respuesta": [
+        "B"
+      ],
+      "explicacion": "Trampa frecuente: la ingesta periódica de BigQuery/Cloud Storage no respeta ACLs; la ingesta one-time con metadatos de ACL sí. Alternativa: acceder vía herramienta con la identidad del usuario."
+    },
+    {
+      "id": "S1-Q16",
+      "objetivo": "1.1",
+      "concepto": "Escalamiento a humano",
+      "dificultad": "media",
+      "pregunta": "In a customer-service flow, users who fail to be understood three times in a row must be transferred to a live agent. Which configuration implements this deterministically?",
+      "opciones": {
+        "A": "Increase the NLU classification threshold.",
+        "B": "An event handler for the third no-match event (e.g. sys.no-match-3) that transitions to an escalation page performing a live-agent handoff.",
+        "C": "A webhook that counts messages.",
+        "D": "An instruction: 'if the user is frustrated, transfer them'."
+      },
+      "respuesta": [
+        "B"
+      ],
+      "explicacion": "Los event handlers de no-match/no-input con contador (sys.no-match-N) permiten escalar de forma determinista a una página de handoff. D es no determinista."
+    }
+  ]
+}

@@ -1,0 +1,279 @@
+{
+  "sesion": 4,
+  "dominio": "Evaluating and deploying agentic workflows (~22%)",
+  "preguntas": [
+    {
+      "id": "S4-Q01",
+      "objetivo": "4.1",
+      "concepto": "Trayectoria vs respuesta",
+      "dificultad": "fácil",
+      "pregunta": "A refund agent gives correct final answers in testing, but in production it sometimes issues refunds without first calling verify_order. Which evaluation dimension would have caught this?",
+      "opciones": {
+        "A": "Tool trajectory evaluation (expected tool calls and their order/arguments).",
+        "B": "Token usage.",
+        "C": "Latency percentiles.",
+        "D": "Final response ROUGE score."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "Calidad de agentes = trayectoria (qué herramientas, con qué argumentos, en qué orden) + respuesta final. Saltarse verify_order es un error de trayectoria que no se ve mirando solo la respuesta."
+    },
+    {
+      "id": "S4-Q02",
+      "objetivo": "4.1",
+      "concepto": "Match type de trayectoria",
+      "dificultad": "media",
+      "pregunta": "Your research agent legitimately performs between 3 and 7 searches before calling summarize, but it must always call search before summarize. The EXACT trajectory metric fails most runs. What should you configure?",
+      "opciones": {
+        "A": "Remove trajectory evaluation.",
+        "B": "Use BLEU on the final response.",
+        "C": "Use an IN_ORDER (or ANY_ORDER where order doesn't matter) trajectory match that checks the required calls without penalizing extra ones.",
+        "D": "Keep EXACT and lower the threshold to 0.1."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "EXACT exige llamadas idénticas sin extras. IN_ORDER verifica las requeridas en orden permitiendo extras; ANY_ORDER si el orden no importa."
+    },
+    {
+      "id": "S4-Q03",
+      "objetivo": "4.1",
+      "concepto": "Métrica semántica",
+      "dificultad": "media",
+      "pregunta": "Reference answers exist, but the agent phrases correct answers differently each time, so response_match_score (ROUGE-based) is low even for correct outputs. What should you use?",
+      "opciones": {
+        "A": "BLEU.",
+        "B": "Remove the references.",
+        "C": "An LLM-judged semantic equivalence metric such as final_response_match_v2.",
+        "D": "Exact string match."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "ROUGE/BLEU miden solapamiento léxico. Con paráfrasis válidas se usa un juez semántico contra la referencia (final_response_match_v2)."
+    },
+    {
+      "id": "S4-Q04",
+      "objetivo": "4.1",
+      "concepto": "Sin referencia: rúbricas",
+      "dificultad": "media",
+      "pregunta": "For open-ended travel recommendations there is no single correct answer, but the business can describe what 'good' means (mentions budget, cites sources, no unsafe advice). Which evaluation approach fits?",
+      "opciones": {
+        "A": "Count the words in the answer.",
+        "B": "Rubric-based LLM-as-judge criteria (e.g. rubric_based_final_response_quality) with explicit rubrics, calibrated against human ratings.",
+        "C": "Reference-based exact match.",
+        "D": "Trajectory EXACT match only."
+      },
+      "respuesta": [
+        "B"
+      ],
+      "explicacion": "Sin referencia → juez con rúbricas explícitas. Calibra el juez con calificaciones humanas antes de usarlo como gate."
+    },
+    {
+      "id": "S4-Q05",
+      "objetivo": "4.1",
+      "concepto": "Evaluación en CI/CD",
+      "dificultad": "difícil",
+      "pregunta": "You want to gate every pull request of an ADK agent on quality without making CI slow, costly or flaky. What is the best design?",
+      "opciones": {
+        "A": "Evaluate only in production.",
+        "B": "On every PR run a small golden evalset with deterministic metrics (tool trajectory, response match) via pytest/adk eval; run the larger LLM-judge and user-simulation suites nightly or before release.",
+        "C": "Run the full LLM-judge suite with 500 cases on every commit.",
+        "D": "Only evaluate manually before each release."
+      },
+      "respuesta": [
+        "B"
+      ],
+      "explicacion": "Métricas deterministas baratas como gate por PR; suites con juez LLM (lentas, costosas, con varianza) en nightly/pre-release. Evaluación continua, no solo en un notebook."
+    },
+    {
+      "id": "S4-Q06",
+      "objetivo": "4.1",
+      "concepto": "Datos de prueba",
+      "dificultad": "media",
+      "pregunta": "You are building the first evaluation dataset for a customer-service agent that has been in pilot for a month. Which source should form the core of the golden set?",
+      "opciones": {
+        "A": "Real sessions and production traces from the pilot (curated and labeled), complemented with synthetic edge cases and adversarial prompts.",
+        "B": "Random questions from the internet.",
+        "C": "Only synthetic prompts generated by an LLM.",
+        "D": "The system instruction itself."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "Prioriza tráfico real (sesiones/trazas curadas) y compleméntalo con casos borde, adversariales y sintéticos para cubrir huecos."
+    },
+    {
+      "id": "S4-Q07",
+      "objetivo": "4.1",
+      "concepto": "Monitoreo online",
+      "dificultad": "media",
+      "pregunta": "Six weeks after launch, users report answers are getting worse, although offline evals still pass. What should you implement?",
+      "opciones": {
+        "A": "Online evaluation monitors that sample production traces, score them (e.g. hallucination, task success, safety), alert on trends, and feed low-scoring traces back into the golden set.",
+        "B": "Re-run the same offline evalset daily.",
+        "C": "Increase max_llm_calls.",
+        "D": "Rollback to the first version."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "Drift de producción → monitores online sobre trazas reales con alertas; cierra el ciclo añadiendo los casos fallidos al golden set."
+    },
+    {
+      "id": "S4-Q08",
+      "objetivo": "4.1",
+      "concepto": "Grounding",
+      "dificultad": "media",
+      "pregunta": "The agent confidently states policy details that are not in any retrieved document. Which metric specifically detects this?",
+      "opciones": {
+        "A": "response_match_score",
+        "B": "A hallucination/groundedness metric that checks each claim against the context and tool outputs (e.g. hallucinations_v1).",
+        "C": "tool_trajectory_avg_score",
+        "D": "Latency p95."
+      },
+      "respuesta": [
+        "B"
+      ],
+      "explicacion": "Afirmaciones no respaldadas → métrica de alucinación/groundedness que valida cada frase contra el contexto y las salidas de herramientas."
+    },
+    {
+      "id": "S4-Q09",
+      "objetivo": "4.2",
+      "concepto": "Elección de runtime",
+      "dificultad": "media",
+      "pregunta": "A Python ADK agent needs managed sessions and memory, built-in tracing and minimal operations; the team has no Kubernetes skills. Which runtime fits best?",
+      "opciones": {
+        "A": "Agent Runtime (formerly Vertex AI Agent Engine).",
+        "B": "GKE Autopilot.",
+        "C": "Compute Engine VMs.",
+        "D": "Cloud Functions."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "Agente Python/ADK, sesiones y memoria gestionadas, mínima operación → Agent Runtime."
+    },
+    {
+      "id": "S4-Q10",
+      "objetivo": "4.2",
+      "concepto": "Elección de runtime",
+      "dificultad": "media",
+      "pregunta": "An agent written in TypeScript must be exposed as an HTTP service, scale to zero at night, and sit behind the company's existing load balancer and IAP. Which runtime fits best?",
+      "opciones": {
+        "A": "Agent Runtime.",
+        "B": "GKE with GPUs.",
+        "C": "Cloud Run.",
+        "D": "App Engine Flexible."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "Cualquier lenguaje en contenedor, serverless, scale-to-zero e integración HTTP/LB/IAP → Cloud Run."
+    },
+    {
+      "id": "S4-Q11",
+      "objetivo": "4.2",
+      "concepto": "Cloud Run: sesiones",
+      "dificultad": "difícil",
+      "pregunta": "An ADK agent on Cloud Run loses conversation context whenever it scales in or a new revision is deployed. Session affinity is already enabled. What is the correct fix?",
+      "opciones": {
+        "A": "Externalize sessions (e.g. --session_service_uri pointing to Agent Platform Sessions or a Cloud SQL database) instead of in-memory sessions.",
+        "B": "Enable HTTP/2.",
+        "C": "Set max instances to 1.",
+        "D": "Increase the request timeout."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "La afinidad de sesión es best-effort y no sobrevive a terminaciones. El estado debe externalizarse (agentengine:// o base de datos)."
+    },
+    {
+      "id": "S4-Q12",
+      "objetivo": "4.2",
+      "concepto": "Runaway loops",
+      "dificultad": "difícil",
+      "pregunta": "Cloud Trace shows some invocations with dozens of repeated call_llm → execute_tool spans lasting minutes, and token usage spikes. What is the most direct ADK safeguard?",
+      "opciones": {
+        "A": "Increase min_instances.",
+        "B": "Set max_llm_calls=0.",
+        "C": "Set max_llm_calls in the RunConfig to a sensible positive limit (and tighten tool descriptions/termination conditions).",
+        "D": "Enable DEBUG logging."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "max_llm_calls acota las llamadas al LLM por invocación. Ojo: 0 o negativo = sin límite. Además mejora descripciones y condiciones de salida."
+    },
+    {
+      "id": "S4-Q13",
+      "objetivo": "4.2",
+      "concepto": "Errores transitorios de herramientas",
+      "dificultad": "media",
+      "pregunta": "A flaky backend API causes occasional tool errors that abort the whole agent run. You want the agent to reflect on the error and retry a bounded number of times across all tools. What should you add?",
+      "opciones": {
+        "A": "A LoopAgent around the whole agent with no limit.",
+        "B": "Remove the tool.",
+        "C": "A higher temperature.",
+        "D": "ReflectAndRetryToolPlugin with a small max_retries on the Runner/App."
+      },
+      "respuesta": [
+        "D"
+      ],
+      "explicacion": "El plugin de reflexión y reintento captura errores de herramientas, pide al modelo corregir y reintenta de forma acotada, aplicado globalmente."
+    },
+    {
+      "id": "S4-Q14",
+      "objetivo": "4.2",
+      "concepto": "Latencia creciente",
+      "dificultad": "difícil",
+      "pregunta": "Response latency grows steadily as conversations get longer; traces show input tokens increasing every turn. Which TWO changes help most? (Choose 2)",
+      "opciones": {
+        "A": "Add more tools.",
+        "B": "Limit the history loaded per turn (e.g. only recent events) or compact/summarize older context.",
+        "C": "Switch to InMemorySessionService.",
+        "D": "Enable context caching for the large static prefix (instructions, tool definitions)."
+      },
+      "respuesta": [
+        "B",
+        "D"
+      ],
+      "explicacion": "Menos historial por turno (eventos recientes / compactación) y cachear el prefijo estático reducen tokens de entrada y latencia."
+    },
+    {
+      "id": "S4-Q15",
+      "objetivo": "4.2",
+      "concepto": "Cold starts / concurrencia",
+      "dificultad": "difícil",
+      "pregunta": "An Agent Runtime deployment has acceptable latency at steady state but p95 spikes during morning bursts because new instances are starting. What should you tune first?",
+      "opciones": {
+        "A": "Switch to a bigger model.",
+        "B": "Reduce max_instances.",
+        "C": "Set min_instances above zero to keep warm capacity (and tune per-instance concurrency for async agents).",
+        "D": "Disable tracing."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "Picos con cold starts → instancias mínimas calientes; para agentes async, ajustar la concurrencia por instancia mejora el aprovechamiento."
+    },
+    {
+      "id": "S4-Q16",
+      "objetivo": "4.2",
+      "concepto": "Red privada",
+      "dificultad": "difícil",
+      "pregunta": "An agent on Agent Runtime must call an internal API reachable only inside the company's VPC (connected to on-prem). How do you provide connectivity?",
+      "opciones": {
+        "A": "Make the API public with an API key.",
+        "B": "Serverless VPC Access connector.",
+        "C": "Private Service Connect interface (network attachment) for the agent, with DNS peering for private hostnames.",
+        "D": "Cloud NAT only."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "Agent Runtime usa PSC interface + network attachment (y DNS peering) para llegar a redes privadas; no conectores de Serverless VPC Access. Exponer la API públicamente degrada la seguridad."
+    }
+  ]
+}

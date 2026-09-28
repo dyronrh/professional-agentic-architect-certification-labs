@@ -1,0 +1,24 @@
+# Borrador: Pod que ejecuta código Python generado por un LLM (NO confiable).
+# Tiene varios problemas de seguridad a propósito. Corrígelos siguiendo el README del lab.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ejecutor-codigo-agente
+  namespace: agent-sandbox
+  labels:
+    app: ejecutor-codigo
+spec:
+  hostNetwork: true
+  serviceAccountName: default
+  containers:
+    - name: python
+      image: python:latest
+      command: ["python", "/workspace/codigo_generado.py"]
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: workspace
+          mountPath: /workspace
+  volumes:
+    - name: workspace
+      emptyDir: {}

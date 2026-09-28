@@ -1,0 +1,17 @@
+{
+  "caso": "Gobierno de una flota de agentes",
+  "criterios": [
+    {"id": "identidad", "descripcion": "Reemplaza la SA compartida por Agent Identity por agente (Workload Identity en GKE si aplica) con roles mínimos; roles base a principal set; PAB para acotar a qué recursos pueden llegar; menciona que PAB no otorga acceso y el efecto de recrear agentes.", "puntos": 5,
+     "indicadores": ["Agent Identity", "mínimo privilegio", "PAB", "PAB no otorga"]},
+    {"id": "autenticacion", "descripcion": "Google APIs: identidad del agente/ADC; MCP Cloud Run: ID token con aud + run.invoker; SaaS en nombre del ejecutivo: OAuth 3LO con consentimiento y bóveda; batch: 2LO; API key: proveedor/bóveda gestionada, nunca en código.", "puntos": 5,
+     "indicadores": ["ADC", "ID token", "3LO", "2LO", "bóveda de keys"]},
+    {"id": "herramientas", "descripcion": "Registrar MCP/agentes en Agent Registry; Agent Gateway con políticas por herramienta (bloquear borrar_cliente, restringir actualizar); logs de gateway/auditoría atribuibles a agente y usuario.", "puntos": 4,
+     "indicadores": ["registry", "gateway + políticas por tool", "auditoría"]},
+    {"id": "guardrails", "descripcion": "Capas: Model Armor (templates + floor settings org) en prompts/respuestas; saneo de salidas de herramientas (inyección indirecta) con callback/plugin; validación en herramientas; HITL/confirmación para reembolsos y envíos; gobierno semántico para reglas trimestrales complementado con controles deterministas; no confiar en instrucciones.", "puntos": 6,
+     "indicadores": ["Model Armor + floor", "salidas de herramientas", "HITL", "gobierno semántico + determinista"]},
+    {"id": "datos", "descripcion": "VPC Service Controls con el proyecto en el perímetro antes de desplegar; egress controlado; redacción/minimización de PII (SDP/Model Armor); RR. HH. con propagación de identidad del usuario / retrieval con ACL, no SA sobreprivilegiada.", "puntos": 4,
+     "indicadores": ["VPC-SC", "PII", "propagación de identidad"]},
+    {"id": "rollout", "descripcion": "Secuencia: identidades → registro → políticas en DRY_RUN / Model Armor INSPECT_ONLY → analizar logs → ajustar allowlists (incl. endpoints esenciales) → ENFORCE; evaluación de seguridad (red teaming) antes de cada release.", "puntos": 3,
+     "indicadores": ["dry-run/inspect", "análisis de logs", "enforce gradual"]}
+  ]
+}

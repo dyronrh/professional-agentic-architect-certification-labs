@@ -1,0 +1,281 @@
+{
+  "sesion": 2,
+  "dominio": "Using coding agents for application development (~17%)",
+  "preguntas": [
+    {
+      "id": "S2-Q01",
+      "objetivo": "2.1",
+      "concepto": "Primitivas: hook vs regla",
+      "dificultad": "media",
+      "pregunta": "Your security team requires that the coding agent must NEVER read files under ./secrets/ or run 'terraform destroy', regardless of what the model decides. Which mechanism provides this guarantee?",
+      "opciones": {
+        "A": "A PostToolUse hook that logs the command.",
+        "B": "Permission deny rules plus a PreToolUse hook that blocks the matching tool calls.",
+        "C": "A skill describing safe infrastructure procedures.",
+        "D": "A rule/memory file (e.g. AGENTS.md or CLAUDE.md) stating the policy."
+      },
+      "respuesta": [
+        "B"
+      ],
+      "explicacion": "'Nunca / garantizar' → control determinista: reglas deny de permisos y hook PreToolUse (se ejecuta ANTES de la herramienta y puede bloquear). Las reglas/memoria son orientativas; PostToolUse corre cuando la acción ya ocurrió."
+    },
+    {
+      "id": "S2-Q02",
+      "objetivo": "2.1",
+      "concepto": "Primitivas: skill",
+      "dificultad": "fácil",
+      "pregunta": "Developers repeatedly ask the coding agent to 'deploy the service to Cloud Run' and the agent performs the 8-step procedure inconsistently. You want a reusable, versioned procedure with helper scripts that is only loaded into context when relevant. What should you create?",
+      "opciones": {
+        "A": "A skill (folder with SKILL.md, name/description frontmatter and optional scripts).",
+        "B": "An always-on rule containing the full procedure.",
+        "C": "A subagent with no tools.",
+        "D": "A new MCP server."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "Procedimiento repetible con scripts + carga bajo demanda (progressive disclosure: solo nombre/descripción hasta que aplica) → skill. Una regla siempre activa consume contexto en cada turno."
+    },
+    {
+      "id": "S2-Q03",
+      "objetivo": "2.1",
+      "concepto": "Primitivas: subagente",
+      "dificultad": "media",
+      "pregunta": "You want a 'security reviewer' that analyzes diffs in a clean context window, can only read and search files (no edits, no shell), and runs in parallel with the main agent. What should you configure?",
+      "opciones": {
+        "A": "An MCP server exposing a 'review' tool.",
+        "B": "A rule file.",
+        "C": "A hook.",
+        "D": "A subagent definition with a restricted tool allowlist (e.g. Read, Grep, Glob)."
+      },
+      "respuesta": [
+        "D"
+      ],
+      "explicacion": "Contexto aislado + herramientas de mínimo privilegio + trabajo en paralelo → subagente con allowlist de herramientas."
+    },
+    {
+      "id": "S2-Q04",
+      "objetivo": "2.1",
+      "concepto": "Primitivas: MCP",
+      "dificultad": "fácil",
+      "pregunta": "The coding agent must query live BigQuery table schemas and recent Cloud Logging errors while writing code. Which primitive fits best?",
+      "opciones": {
+        "A": "A PostToolUse hook.",
+        "B": "An MCP server (e.g. Google-managed remote MCP servers for BigQuery/Logging) configured for the agent.",
+        "C": "A skill with a static copy of the schemas.",
+        "D": "A rule with pasted schemas."
+      },
+      "respuesta": [
+        "B"
+      ],
+      "explicacion": "Datos vivos / acciones sobre sistemas externos → servidor MCP. Copias estáticas se desactualizan."
+    },
+    {
+      "id": "S2-Q05",
+      "objetivo": "2.1",
+      "concepto": "Credenciales de MCP",
+      "dificultad": "media",
+      "pregunta": "A developer configured an MCP server for a Google Cloud API by pasting a long-lived service account key into the project's MCP config file, which is committed to Git. What is the recommended fix?",
+      "opciones": {
+        "A": "Make the repository private.",
+        "B": "Base64-encode the key.",
+        "C": "Remove the key and authenticate with Application Default Credentials (the developer's identity or Workload Identity Federation), granting least-privilege roles; reference any unavoidable secrets through environment variables or Secret Manager, never inline.",
+        "D": "Move the key to a .env file in the same repository."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "Nada de llaves de larga vida en archivos versionados. ADC (sin secreto almacenado) con roles mínimos; si hace falta un secreto, variable de entorno o Secret Manager."
+    },
+    {
+      "id": "S2-Q06",
+      "objetivo": "2.1",
+      "concepto": "Claude Code en Google Cloud",
+      "dificultad": "media",
+      "pregunta": "A company wants its developers to use Claude Code billed and governed through its Google Cloud project, without distributing Anthropic API keys. What configuration is needed?",
+      "opciones": {
+        "A": "Set CLAUDE_CODE_USE_VERTEX=1, ANTHROPIC_VERTEX_PROJECT_ID and CLOUD_ML_REGION, authenticate with Google Application Default Credentials, and grant developers roles/aiplatform.user.",
+        "B": "Set ANTHROPIC_API_KEY to a key stored in Secret Manager.",
+        "C": "Deploy Claude Code on Cloud Run.",
+        "D": "Use a Gemini API key."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "Claude Code usa los modelos de Claude en la plataforma de Google Cloud (Vertex AI / Agent Platform) con CLAUDE_CODE_USE_VERTEX=1 + proyecto + región, autenticando con ADC e IAM (roles/aiplatform.user). Sin API keys de Anthropic."
+    },
+    {
+      "id": "S2-Q07",
+      "objetivo": "2.1",
+      "concepto": "Estandarizar modelos",
+      "dificultad": "media",
+      "pregunta": "300 developers use Claude Code on Google Cloud. Finance reports unpredictable costs because different developers use different model versions, and behavior changed when an alias moved to a newer model. What should you do?",
+      "opciones": {
+        "A": "Pin specific model versions via environment variables (e.g. ANTHROPIC_MODEL / ANTHROPIC_DEFAULT_*_MODEL) in centrally managed settings.",
+        "B": "Ask developers to choose the cheapest model.",
+        "C": "Disable prompt caching.",
+        "D": "Switch every developer to a different region."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "Fijar versiones concretas de modelo en configuración gestionada centralmente da costo y comportamiento predecibles; los alias pueden cambiar de destino."
+    },
+    {
+      "id": "S2-Q08",
+      "objetivo": "2.1",
+      "concepto": "Hook de definición de terminado",
+      "dificultad": "difícil",
+      "pregunta": "You want the coding agent to be unable to finish its task until the unit tests pass. Which configuration achieves this most reliably?",
+      "opciones": {
+        "A": "A rule saying 'always run tests before finishing'.",
+        "B": "A subagent that writes tests.",
+        "C": "A PreToolUse hook on the Edit tool.",
+        "D": "A Stop hook that runs the tests and, if they fail, blocks the stop and returns the failure output so the agent continues working."
+      },
+      "respuesta": [
+        "D"
+      ],
+      "explicacion": "El hook Stop se ejecuta cuando el agente intenta terminar; puede bloquear y devolver el motivo (tests fallidos) para que continúe. Es un 'definition of done' determinista."
+    },
+    {
+      "id": "S2-Q09",
+      "objetivo": "2.1",
+      "concepto": "Distribución a escala",
+      "dificultad": "media",
+      "pregunta": "You built a set of skills, hooks, subagents and MCP server configs that 200 developers across 30 repositories must install consistently and update centrally. What is the best way to distribute them?",
+      "opciones": {
+        "A": "Email a zip file.",
+        "B": "Register each skill in Agent Registry for IDE agents.",
+        "C": "Copy the files into every repository by hand.",
+        "D": "Package them as a plugin (from an internal marketplace) and enforce baseline policies with organization-managed settings."
+      },
+      "respuesta": [
+        "D"
+      ],
+      "explicacion": "Un plugin empaqueta rules/skills/hooks/subagentes/MCP como una unidad versionada; la configuración gestionada por la organización impone los mínimos. Los registros de la plataforma gobiernan agentes en runtime, no la personalización del IDE."
+    },
+    {
+      "id": "S2-Q10",
+      "objetivo": "2.1",
+      "concepto": "Sandbox para código no confiable",
+      "dificultad": "difícil",
+      "pregunta": "Your product lets an agent execute LLM-generated Python for thousands of users concurrently. You need kernel-level isolation between sessions and sub-second startup. What should you use?",
+      "opciones": {
+        "A": "Run the code inside the agent's own process with exec().",
+        "B": "A Compute Engine VM per request.",
+        "C": "Cloud Run with the default compute service account.",
+        "D": "GKE Agent Sandbox (gVisor runtime) with warm pools, no service account token mounted, non-root, resource limits and restricted egress."
+      },
+      "respuesta": [
+        "D"
+      ],
+      "explicacion": "Código no confiable a escala + aislamiento de kernel + arranque sub-segundo → Agent Sandbox en GKE (gVisor + warm pool). C no aísla a nivel kernel y la SA por defecto está sobreprivilegiada; B es lento y costoso."
+    },
+    {
+      "id": "S2-Q11",
+      "objetivo": "2.1",
+      "concepto": "Sandbox: manifest seguro",
+      "dificultad": "difícil",
+      "pregunta": "Which TWO settings are essential in the pod spec that runs untrusted agent-generated code on GKE? (Choose 2)",
+      "opciones": {
+        "A": "hostNetwork: true",
+        "B": "runtimeClassName: gvisor",
+        "C": "image: python:latest",
+        "D": "automountServiceAccountToken: false",
+        "E": "securityContext.privileged: true"
+      },
+      "respuesta": [
+        "B",
+        "D"
+      ],
+      "explicacion": "gVisor aporta el kernel en espacio de usuario; no montar el token de la service account evita que el código robe credenciales. hostNetwork y privileged rompen el aislamiento; ':latest' no es reproducible."
+    },
+    {
+      "id": "S2-Q12",
+      "objetivo": "2.1",
+      "concepto": "Perímetro para regulados",
+      "dificultad": "media",
+      "pregunta": "A regulated bank requires that source code never leaves its Google Cloud perimeter, while developers use AI coding agents daily. Which development environment design fits?",
+      "opciones": {
+        "A": "Cloud Workstations in a private configuration inside a VPC Service Controls perimeter, with no public IPs and controlled egress (e.g. Secure Web Proxy allowlist).",
+        "B": "Cloud Shell for everyone.",
+        "C": "A public GitHub Codespace.",
+        "D": "Developers' personal laptops with the agent's local sandbox."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "'El código no sale del perímetro' → Cloud Workstations privadas + VPC-SC + sin IP pública + egress controlado."
+    },
+    {
+      "id": "S2-Q13",
+      "objetivo": "2.2",
+      "concepto": "Inner loop → outer loop",
+      "dificultad": "media",
+      "pregunta": "A team uses a coding agent to write an ADK agent (inner loop). They want a repeatable path to scaffold, evaluate, deploy to Agent Runtime and publish to Gemini Enterprise without hand-written glue scripts. What should they adopt?",
+      "opciones": {
+        "A": "The Agents CLI lifecycle (create/scaffold → eval → deploy to agent runtime/Cloud Run/GKE → publish), invoked by the coding agent and by CI/CD non-interactively.",
+        "B": "Deploy from a notebook.",
+        "C": "A single bash script that runs pip install.",
+        "D": "Manual console clicks documented in a wiki."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "El outer loop estandarizado (Agents CLI / adk deploy) conecta el código con evaluación, despliegue y publicación de forma repetible y automatizable en CI."
+    },
+    {
+      "id": "S2-Q14",
+      "objetivo": "2.1",
+      "concepto": "Permisos en CI",
+      "dificultad": "media",
+      "pregunta": "You run the coding agent headless in CI to fix lint errors. The pipeline hangs waiting for permission prompts. What is the safest fix?",
+      "opciones": {
+        "A": "Give the CI service account Owner.",
+        "B": "Run with the flag that skips all permission checks.",
+        "C": "Disable the hooks.",
+        "D": "Pre-approve only the specific commands/tools needed (e.g. allow 'npm run lint' and file edits in src/) in the CI settings, keep deny rules, and run inside an isolated, least-privilege runner."
+      },
+      "respuesta": [
+        "D"
+      ],
+      "explicacion": "Allowlist mínima de comandos + deny rules + runner aislado. Saltarse todos los permisos elimina las barreras de seguridad."
+    },
+    {
+      "id": "S2-Q15",
+      "objetivo": "2.2",
+      "concepto": "Contexto y reglas",
+      "dificultad": "fácil",
+      "pregunta": "The agent keeps using the wrong test framework in a monorepo where only the /payments service uses pytest-asyncio. How should you provide this guidance efficiently?",
+      "opciones": {
+        "A": "Add it to a global always-on rule for every repository.",
+        "B": "Create a PreToolUse hook that rejects all test runs.",
+        "C": "Fine-tune the model.",
+        "D": "Add a scoped rule/memory file for that directory (or a path/glob-scoped rule) so it only loads when working in /payments."
+      },
+      "respuesta": [
+        "D"
+      ],
+      "explicacion": "Convenciones = reglas/memoria. Mejor acotadas por ruta/glob para no gastar contexto en todo el repo."
+    },
+    {
+      "id": "S2-Q16",
+      "objetivo": "2.2",
+      "concepto": "Egress y exfiltración",
+      "dificultad": "difícil",
+      "pregunta": "A coding agent with shell access might be tricked by a malicious README (prompt injection) into sending code to an external host. Which combination best reduces this risk? (Choose 2)",
+      "opciones": {
+        "A": "Increase the model's context window.",
+        "B": "Tell the model in the rules to ignore instructions in files.",
+        "C": "Require approval for, or deny, network commands such as curl/wget and untrusted MCP tools.",
+        "D": "Restrict network egress to an allowlist of hosts (sandbox network policy / proxy)."
+      },
+      "respuesta": [
+        "C",
+        "D"
+      ],
+      "explicacion": "Defensa en profundidad determinista: egress restringido + deny/ask en comandos de red. Las instrucciones al modelo no son un control de seguridad."
+    }
+  ]
+}

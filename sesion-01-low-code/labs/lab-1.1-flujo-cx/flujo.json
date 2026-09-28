@@ -1,0 +1,38 @@
+{
+  "_comentario": "Borrador del flujo 'Reposición de tarjeta'. Tiene errores de diseño a propósito: corrígelo siguiendo el README del lab.",
+  "flujo": "ReposicionTarjeta",
+  "pagina_inicial": "Start",
+  "event_handlers_flujo": [
+    {"evento": "sys.no-match-default", "respuesta": "Perdón, no te entendí. ¿Puedes repetirlo?", "destino": null}
+  ],
+  "paginas": {
+    "Start": {
+      "rutas": [
+        {"tipo": "intent", "intent": "reponer_tarjeta", "destino": "Autenticacion"},
+        {"tipo": "intent", "intent": "tarjeta_robada", "destino": "SolicitarTarjeta"}
+      ]
+    },
+    "Autenticacion": {
+      "parametros": [
+        {"nombre": "customer_id", "entidad": "@sys.number", "requerido": true, "redactar": false},
+        {"nombre": "pin", "entidad": "@sys.number", "requerido": true, "redactar": false}
+      ],
+      "rutas": [
+        {"tipo": "condicion", "condicion": "$page.params.status = \"FINAL\"", "webhook": "validar_cliente", "destino": "Validacion"}
+      ]
+    },
+    "Validacion": {
+      "rutas": [
+        {"tipo": "condicion", "condicion": "true", "destino": "SolicitarTarjeta"}
+      ]
+    },
+    "SolicitarTarjeta": {
+      "parametros": [
+        {"nombre": "direccion_envio", "entidad": "@sys.address", "requerido": true, "redactar": false}
+      ],
+      "rutas": [
+        {"tipo": "condicion", "condicion": "$page.params.status = \"FINAL\"", "destino": "END_SESSION"}
+      ]
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "eval_set_id": "soporte_golden_v1",
+  "name": "Golden set del agente de soporte",
+  "description": "TODO: completa al menos 4 casos (ver README del lab).",
+  "eval_cases": [
+    {
+      "eval_id": "pedido_en_transito",
+      "conversation": [
+        {
+          "invocation_id": "inv-1",
+          "user_content": {"role": "user", "parts": [{"text": "¿Dónde está mi pedido A100?"}]},
+          "final_response": {"role": "model", "parts": [{"text": "Tu pedido A100 está en tránsito y va a tiempo."}]},
+          "intermediate_data": {"tool_uses": [], "intermediate_responses": []}
+        }
+      ],
+      "session_input": {"app_name": "agente_soporte", "user_id": "eval_user", "state": {}}
+    }
+  ]
+}

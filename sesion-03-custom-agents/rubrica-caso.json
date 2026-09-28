@@ -1,0 +1,19 @@
+{
+  "caso": "Plataforma de agentes para una aseguradora",
+  "criterios": [
+    {"id": "arquitectura", "descripcion": "Proceso de siniestro como grafo/workflow determinista (fraude primero, ramas por monto en código, nodo HITL) en vez de una instrucción larga; uso correcto de AgentTool vs sub-agentes/transfer; justifica cada primitiva.", "puntos": 5,
+     "indicadores": ["grafo o workflow agents", "routing en código", "HITL", "AgentTool vs transfer"]},
+    {"id": "modelos", "descripcion": "Modelo pequeño/rápido (Flash-Lite/Flash) para recepción de alto volumen o triage; Pro/thinking donde hay razonamiento; menciona costo/latencia y quizá caching.", "puntos": 3,
+     "indicadores": ["right-sizing", "trade-off explícito"]},
+    {"id": "memoria", "descripcion": "Sessions persistentes (Agent Platform Sessions / DB) en vez de InMemory; Memory Bank para hechos de largo plazo con consolidación; prefijos user:/app:/temp: bien usados.", "puntos": 4,
+     "indicadores": ["sessions persistentes", "Memory Bank", "prefijos de estado"]},
+    {"id": "rag", "descripcion": "Pólizas: Agent Search o RAG Engine con layout parser; búsqueda híbrida para códigos exactos + reranking; repuestos: AlloyDB con índice vectorial y filtros SQL (datos transaccionales); menciona inmutabilidad del modelo de embeddings o equivalente.", "puntos": 5,
+     "indicadores": ["producto por fuente", "layout parser", "híbrida", "reranking", "AlloyDB para datos vivos"]},
+    {"id": "interoperabilidad", "descripcion": "MCP para CRM/herramientas; A2A para Pagos (otro equipo/framework); Agent Registry para descubrimiento en vez de URLs hardcodeadas; auth hacia Cloud Run MCP con ID token y run.invoker.", "puntos": 4,
+     "indicadores": ["MCP vs A2A correcto", "Agent Registry", "auth a Cloud Run"]},
+    {"id": "identidad", "descripcion": "Agent Identity por agente con roles mínimos; roles base a un principal set; recrear agente = principal nuevo, re-vincular; no llaves de SA.", "puntos": 4,
+     "indicadores": ["Agent Identity", "mínimo privilegio", "recreación", "sin llaves"]},
+    {"id": "tradeoffs", "descripcion": "Dos trade-offs concretos y honestos (p. ej. determinismo vs flexibilidad, costo de reranking/latencia, complejidad operativa de A2A).", "puntos": 2,
+     "indicadores": ["2 trade-offs razonados"]}
+  ]
+}

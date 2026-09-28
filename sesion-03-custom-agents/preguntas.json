@@ -1,0 +1,348 @@
+{
+  "sesion": 3,
+  "dominio": "Developing custom agents (~33%)",
+  "preguntas": [
+    {
+      "id": "S3-Q01",
+      "objetivo": "3.1",
+      "concepto": "Workflow agents",
+      "dificultad": "fácil",
+      "pregunta": "An ADK agent must run three independent searches (flights, hotels, weather) and then combine the results into a single itinerary. Which composition is most appropriate?",
+      "opciones": {
+        "A": "SequentialAgent([ParallelAgent([flights, hotels, weather]), writer]), each searcher writing to a distinct output_key.",
+        "B": "LoopAgent([flights, hotels, weather, writer])",
+        "C": "ParallelAgent([flights, hotels, weather, writer])",
+        "D": "A single LlmAgent with a long instruction describing all steps."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "Tareas independientes → ParallelAgent; combinar después → SequentialAgent con el redactor al final. output_key distintos evitan pisar el mismo estado (race conditions). C ejecutaría el redactor antes de tener los datos."
+    },
+    {
+      "id": "S3-Q02",
+      "objetivo": "3.1",
+      "concepto": "LoopAgent",
+      "dificultad": "media",
+      "pregunta": "A critic/refiner LoopAgent occasionally runs for minutes and consumes huge token volumes. What TWO changes are most appropriate? (Choose 2)",
+      "opciones": {
+        "A": "Replace the LoopAgent with a ParallelAgent.",
+        "B": "Raise the model temperature.",
+        "C": "Set max_iterations on the LoopAgent.",
+        "D": "Give the critic the exit_loop tool (or escalate) so the loop ends when quality criteria are met."
+      },
+      "respuesta": [
+        "C",
+        "D"
+      ],
+      "explicacion": "Un LoopAgent necesita un tope (max_iterations) y una condición de salida (exit_loop/escalate). ParallelAgent no itera."
+    },
+    {
+      "id": "S3-Q03",
+      "objetivo": "3.1",
+      "concepto": "Sesiones persistentes",
+      "dificultad": "fácil",
+      "pregunta": "After each deployment of your ADK agent, users lose their conversation history. The Runner uses InMemorySessionService. What should you change?",
+      "opciones": {
+        "A": "Use Memory Bank instead of sessions.",
+        "B": "Store the history in the agent instruction.",
+        "C": "Increase instance memory.",
+        "D": "Use a persistent session service such as VertexAiSessionService (Agent Platform Sessions) or DatabaseSessionService."
+      },
+      "respuesta": [
+        "D"
+      ],
+      "explicacion": "InMemorySessionService se pierde al reiniciar. Sessions persistentes: Agent Platform Sessions (VertexAiSessionService) o base de datos. Memory Bank es memoria de largo plazo entre conversaciones, no el historial de la sesión."
+    },
+    {
+      "id": "S3-Q04",
+      "objetivo": "3.1",
+      "concepto": "Prefijos de estado",
+      "dificultad": "media",
+      "pregunta": "In ADK session state, a user's preferred currency must be available in ALL of that user's future sessions, while an intermediate calculation must never be persisted. Which keys should you use?",
+      "opciones": {
+        "A": "'currency' and 'calc'",
+        "B": "'temp:currency' and 'app:calc'",
+        "C": "'user:currency' and 'temp:calc'",
+        "D": "'app:currency' and 'user:calc'"
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "user: se comparte entre sesiones del mismo usuario; app: entre todos los usuarios; temp: solo vive durante la invocación actual; sin prefijo = solo esa sesión."
+    },
+    {
+      "id": "S3-Q05",
+      "objetivo": "3.1",
+      "concepto": "Memory Bank",
+      "dificultad": "media",
+      "pregunta": "A support agent must remember facts about each customer across months of separate conversations (e.g. 'prefers email', 'has two cars'), consolidating and de-duplicating facts over time. What should you use?",
+      "opciones": {
+        "A": "Agent Platform Memory Bank, generating memories from sessions and retrieving them with preload_memory/load_memory.",
+        "B": "A bigger context window.",
+        "C": "Store every transcript in the system instruction.",
+        "D": "'temp:' state."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "Memoria de largo plazo con extracción, consolidación y deduplicación de hechos → Memory Bank. preload_memory carga en cada turno; load_memory deja que el LLM decida."
+    },
+    {
+      "id": "S3-Q06",
+      "objetivo": "3.1",
+      "concepto": "Callbacks vs plugins",
+      "dificultad": "media",
+      "pregunta": "The same PII-redaction guardrail must apply to every agent, model call and tool call in an application with 12 agents. What is the cleanest ADK mechanism?",
+      "opciones": {
+        "A": "Add a sentence to each agent's instruction.",
+        "B": "Copy a before_model_callback into each of the 12 agents.",
+        "C": "Implement a Plugin registered on the Runner/App so it applies globally.",
+        "D": "Wrap each agent in an AgentTool."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "Callback = regla de un agente; Plugin = mismo comportamiento transversal en todos los agentes, modelos y herramientas del Runner."
+    },
+    {
+      "id": "S3-Q07",
+      "objetivo": "3.1",
+      "concepto": "AgentTool vs sub_agents",
+      "dificultad": "media",
+      "pregunta": "A coordinator agent must call a 'translator' agent, get its result back, and continue reasoning, keeping control of the conversation. How should the translator be attached?",
+      "opciones": {
+        "A": "As a sub_agent, relying on LLM-driven transfer.",
+        "B": "Wrapped as AgentTool(translator) in the coordinator's tools.",
+        "C": "In a ParallelAgent with the coordinator.",
+        "D": "As a remote A2A agent in another project."
+      },
+      "respuesta": [
+        "B"
+      ],
+      "explicacion": "Con AgentTool el padre invoca al hijo como herramienta y recibe el resultado, manteniendo el control. Con sub_agents + transfer, el control de la conversación pasa al sub-agente."
+    },
+    {
+      "id": "S3-Q08",
+      "objetivo": "3.1",
+      "concepto": "Determinismo con grafos",
+      "dificultad": "difícil",
+      "pregunta": "A claims process has strict branching (auto-approve under $500, manual review above, fraud check always first) and a human approval pause. Today it is a single LLM agent with a long instruction and it sometimes skips the fraud check. What is the best redesign?",
+      "opciones": {
+        "A": "Use LLM-driven transfer between five sub-agents.",
+        "B": "Model it as a deterministic graph workflow (code/function nodes for routing, LLM nodes only where judgment is needed, a node that requests human input), or as workflow agents with code-based routing.",
+        "C": "Use a bigger model.",
+        "D": "Add 'ALWAYS run the fraud check first' to the instruction."
+      },
+      "respuesta": [
+        "B"
+      ],
+      "explicacion": "Proceso de negocio determinista → grafo/workflow con enrutamiento en código y pausa HITL; LLM solo donde se requiere juicio. Las instrucciones no garantizan el orden."
+    },
+    {
+      "id": "S3-Q09",
+      "objetivo": "3.1",
+      "concepto": "Selección de modelo",
+      "dificultad": "media",
+      "pregunta": "A triage agent classifies 5 million short tickets per day into 12 categories; latency and cost matter more than deep reasoning. A second agent plans complex multi-step migrations. Which model assignment fits?",
+      "opciones": {
+        "A": "Flash-Lite (or Flash) for triage; a Pro/thinking model for migration planning.",
+        "B": "Pro model for both.",
+        "C": "A self-hosted Gemma for planning and Pro for triage.",
+        "D": "Flash-Lite for both."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "Tamaño correcto: alto volumen y tarea simple → modelo pequeño/barato; razonamiento complejo → Pro o modelo con thinking. Aceptas un trade-off de costo/latencia donde aporta valor."
+    },
+    {
+      "id": "S3-Q10",
+      "objetivo": "3.1",
+      "concepto": "Modelos abiertos",
+      "dificultad": "difícil",
+      "pregunta": "You serve an open model with vLLM on GKE and connect it to ADK through LiteLLM, but the agent never calls tools. What is the most likely fix?",
+      "opciones": {
+        "A": "Switch the Runner to InMemoryRunner.",
+        "B": "Use a ParallelAgent.",
+        "C": "Start vLLM with automatic tool choice enabled and the correct tool-call parser for the model.",
+        "D": "Add the tools to the instruction text."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "vLLM necesita --enable-auto-tool-choice y un --tool-call-parser adecuado para devolver function calls; sin eso el modelo responde solo con texto."
+    },
+    {
+      "id": "S3-Q11",
+      "objetivo": "3.2",
+      "concepto": "Selección de vector store",
+      "dificultad": "media",
+      "pregunta": "You need to add Q&A over 50,000 internal PDFs quickly, with minimal ML engineering, good out-of-the-box relevance and managed parsing/chunking. Which option fits best?",
+      "opciones": {
+        "A": "Store all PDFs in the prompt.",
+        "B": "BigQuery VECTOR_SEARCH with a nightly batch job.",
+        "C": "Agent Search (formerly Vertex AI Search) data store, used from ADK via its search tool.",
+        "D": "Build a custom pipeline with Vector Search, your own chunker and embedding jobs."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "Búsqueda empresarial gestionada, rápida de montar, con parsing/chunking/ranking incluidos → Agent Search. D da más control a cambio de más ingeniería; B no es serving de baja latencia."
+    },
+    {
+      "id": "S3-Q12",
+      "objetivo": "3.2",
+      "concepto": "RAG Engine: embeddings",
+      "dificultad": "difícil",
+      "pregunta": "Your team wants to switch the embedding model of an existing RAG Engine corpus to a newer model. What must you do?",
+      "opciones": {
+        "A": "Create a new corpus with the new embedding model, re-import the documents, switch traffic, then delete the old corpus.",
+        "B": "Change the model in the agent instruction.",
+        "C": "Nothing; embeddings are recomputed automatically.",
+        "D": "Update the corpus configuration in place."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "El modelo de embeddings de un corpus es inmutable: hay que crear uno nuevo y reimportar (vectores de modelos distintos no son comparables)."
+    },
+    {
+      "id": "S3-Q13",
+      "objetivo": "3.2",
+      "concepto": "Búsqueda híbrida",
+      "dificultad": "media",
+      "pregunta": "Users search both conceptual questions ('how do I reset the pump?') and exact part numbers ('PX-4471-B'). Dense semantic retrieval misses the part numbers. What should you add?",
+      "opciones": {
+        "A": "A larger embedding model.",
+        "B": "Fine-tune the LLM.",
+        "C": "Hybrid search combining sparse/keyword and dense retrieval (e.g. with reciprocal rank fusion), optionally followed by reranking.",
+        "D": "Lower the top-k."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "Identificadores exactos → señal léxica (sparse). Híbrida = densa + sparse (RRF); el reranking mejora el orden final."
+    },
+    {
+      "id": "S3-Q14",
+      "objetivo": "3.2",
+      "concepto": "Reranking y chunking",
+      "dificultad": "media",
+      "pregunta": "Retrieval returns the right documents but the most relevant chunk is often ranked 7th, and tables are split in the middle across chunks. Which TWO improvements address these issues? (Choose 2)",
+      "opciones": {
+        "A": "Remove metadata filters.",
+        "B": "Use a layout-aware parser and chunking so tables stay intact.",
+        "C": "Increase temperature.",
+        "D": "Add a reranking step (e.g. Ranking API) after retrieval."
+      },
+      "respuesta": [
+        "B",
+        "D"
+      ],
+      "explicacion": "Orden deficiente → reranking. Tablas partidas → parser/chunking consciente del layout."
+    },
+    {
+      "id": "S3-Q15",
+      "objetivo": "3.2",
+      "concepto": "Vector store transaccional",
+      "dificultad": "difícil",
+      "pregunta": "An e-commerce agent must run semantic search over products combined with strict SQL filters on live inventory and price that change every second, in the same transactional database. Which option fits best?",
+      "opciones": {
+        "A": "AlloyDB for PostgreSQL with vector indexes (e.g. ScaNN) and SQL filtering.",
+        "B": "RAG Engine with a static corpus.",
+        "C": "BigQuery VECTOR_SEARCH.",
+        "D": "Agent Search with a weekly sync."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "Datos operacionales que cambian constantemente + filtros SQL + semántica en la misma BD → AlloyDB (pgvector/ScaNN). Los índices sincronizados quedarían desactualizados."
+    },
+    {
+      "id": "S3-Q16",
+      "objetivo": "3.3",
+      "concepto": "MCP vs A2A",
+      "dificultad": "media",
+      "pregunta": "Your orchestrator must (1) call a CRM's tools, and (2) delegate an entire task to a 'Billing' agent owned by another team, built on a different framework and deployed separately. Which protocols fit each?",
+      "opciones": {
+        "A": "MCP for both.",
+        "B": "A2A for both.",
+        "C": "MCP for the CRM tools; A2A for the Billing agent.",
+        "D": "REST for both, hard-coding the endpoints."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "MCP conecta agentes con herramientas/datos; A2A conecta agentes con otros agentes autónomos (otro equipo, otro framework, Agent Card). Para sub-agentes en el mismo proceso, A2A sería overhead innecesario."
+    },
+    {
+      "id": "S3-Q17",
+      "objetivo": "3.3",
+      "concepto": "Agent Registry",
+      "dificultad": "media",
+      "pregunta": "Dozens of agents hard-code MCP server and A2A endpoint URLs; when a server moves, agents break, and security cannot see which agent uses which tool. What should you introduce?",
+      "opciones": {
+        "A": "A shared spreadsheet of URLs.",
+        "B": "Environment variables per agent.",
+        "C": "Agent Registry to register MCP servers and agents, with agents resolving toolsets/remote agents from the registry at startup (cached), enabling discovery, topology and policy.",
+        "D": "A DNS wildcard."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "Registro central = descubrimiento, inventario, topología y base para políticas (el gateway usa el registro como allowlist). Resolver una vez al arranque y cachear."
+    },
+    {
+      "id": "S3-Q18",
+      "objetivo": "3.3",
+      "concepto": "Agent Identity",
+      "dificultad": "difícil",
+      "pregunta": "Five agents on Agent Runtime share one service account with broad roles, so audit logs cannot tell which agent accessed a BigQuery dataset. What is the recommended approach?",
+      "opciones": {
+        "A": "Enable per-agent Agent Identity and grant each agent principal only the roles it needs (shared baseline roles to a principal set).",
+        "B": "Grant Owner to each agent's user.",
+        "C": "Create five service account keys and embed one in each agent.",
+        "D": "Keep the shared account but add logging statements."
+      },
+      "respuesta": [
+        "A"
+      ],
+      "explicacion": "Agent Identity da un principal por agente (atado al ciclo de vida del recurso, no impersonable), con mínimo privilegio y auditoría atribuible. Llaves de SA embebidas son un antipatrón."
+    },
+    {
+      "id": "S3-Q19",
+      "objetivo": "3.3",
+      "concepto": "Agent Identity: recreación",
+      "dificultad": "difícil",
+      "pregunta": "After deleting and re-creating an Agent Runtime agent with Agent Identity, it gets permission denied on resources it could access before. Why?",
+      "opciones": {
+        "A": "The model version changed.",
+        "B": "Agent Identity tokens expire every 24 hours.",
+        "C": "VPC-SC blocks new agents for 7 days.",
+        "D": "Re-creating the agent produces a new principal; bindings on the old principal do not carry over. Prefer updating/redeploying the same resource, grant baseline roles to a principal set, and re-bind sensitive roles to the new principal."
+      },
+      "respuesta": [
+        "D"
+      ],
+      "explicacion": "La identidad está ligada al ciclo de vida del recurso: borrar y recrear = principal nuevo, los bindings viejos quedan huérfanos."
+    },
+    {
+      "id": "S3-Q20",
+      "objetivo": "3.1",
+      "concepto": "Herramientas: diseño de contrato",
+      "dificultad": "media",
+      "pregunta": "The model frequently calls your 'get_order' tool with the wrong arguments. The function takes **kwargs and has no docstring. What is the best first fix?",
+      "opciones": {
+        "A": "Increase max_llm_calls.",
+        "B": "Switch to a ParallelAgent.",
+        "C": "Add explicit, typed parameters and a clear docstring describing purpose, arguments and return values (ADK uses them to build the function declaration), and return structured results with a status field.",
+        "D": "Retry the tool call 10 times."
+      },
+      "respuesta": [
+        "C"
+      ],
+      "explicacion": "ADK genera la declaración de la herramienta a partir de la firma tipada y el docstring. Contratos claros (tipos, descripción, respuestas estructuradas con status) mejoran la selección y los argumentos."
+    }
+  ]
+}

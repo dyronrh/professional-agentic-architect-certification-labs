@@ -1,0 +1,19 @@
+{
+  "caso": "Agentes de código en un banco regulado",
+  "criterios": [
+    {"id": "entorno", "descripcion": "Cloud Workstations privadas dentro de un perímetro VPC Service Controls, sin IPs públicas, egress por proxy con allowlist; justifica frente a laptops.", "puntos": 4,
+     "indicadores": ["Cloud Workstations", "VPC-SC", "sin IP pública", "egress controlado"]},
+    {"id": "auth_modelos", "descripcion": "Claude Code con CLAUDE_CODE_USE_VERTEX + ANTHROPIC_VERTEX_PROJECT_ID + región; ADC/WIF sin API keys; roles/aiplatform.user; modelos fijados por versión; considera región por residencia de datos y caching.", "puntos": 4,
+     "indicadores": ["variables de Vertex", "ADC", "IAM mínimo", "modelos fijados"]},
+    {"id": "controles", "descripcion": "Distingue controles deterministas (permisos deny, hooks PreToolUse, Stop hook) de orientativos (reglas/memoria, skills); reconoce que las instrucciones no detienen prompt injection; usa subagentes con allowlist de herramientas.", "puntos": 5,
+     "indicadores": ["deny + PreToolUse", "reglas no son seguridad", "subagentes mínimo privilegio", "Stop hook para tests"]},
+    {"id": "mcp", "descripcion": "Servidores MCP (p. ej. remotos gestionados de Google para BigQuery/Logging) autenticados con ADC y roles de solo lectura; sin secretos en archivos versionados; deshabilitar/denegar herramientas destructivas.", "puntos": 3,
+     "indicadores": ["MCP gestionado", "ADC", "solo lectura", "sin secretos"]},
+    {"id": "escala", "descripcion": "Distribución como plugin/marketplace interno + configuración gestionada por la organización para imponer mínimos; versionado y actualización central.", "puntos": 3,
+     "indicadores": ["plugin", "managed settings", "versionado"]},
+    {"id": "sandbox", "descripcion": "GKE Agent Sandbox con gVisor, warm pools, sin token de SA, no root, límites, egress restringido; descarta Cloud Run con SA por defecto o exec en proceso.", "puntos": 4,
+     "indicadores": ["gVisor", "warm pool", "sin credenciales", "egress"]},
+    {"id": "ciclo", "descripcion": "Outer loop estandarizado: scaffold → eval (evalset/LLM judge) → deploy (Agent Runtime/Cloud Run/GKE) → publicar en Gemini Enterprise, ejecutado no interactivo en CI con cuentas de mínimo privilegio.", "puntos": 3,
+     "indicadores": ["eval como gate", "deploy automatizado", "publicación", "CI no interactivo"]}
+  ]
+}
